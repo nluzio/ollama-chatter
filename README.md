@@ -47,7 +47,7 @@ A simple web interface to chat with AI models running on your own computer (no c
 
 1. **Choose a Model**
    - Select a model from the sidebar dropdown
-   - If no models appear, run: `ollama pull llama2`
+   - If no models appear, run: `ollama pull llama3`
 
 2. **Start Chatting**
    - Type messages in the bottom text box
@@ -68,7 +68,7 @@ Start with these beginner-friendly models:
 
 | Model     | Best For                    | Size    | Command               |
 |-----------|----------------------------|---------|----------------------|
-| llama2    | General chat & assistance  | Medium  | `ollama pull llama2` |
+| llama3    | General chat & assistance  | large  | `ollama pull llama3` |
 | mistral   | Clear, helpful responses   | Medium  | `ollama pull mistral`|
 | tinyllama | Faster, lighter responses  | Small   | `ollama pull tinyllama` |
 | deepseek-r1 | Advanced reasoning tasks | Very Large   | `ollama pull deepseek-r1` |
@@ -103,7 +103,7 @@ ollama pull model-name
 
 1. **No Models Available?**
    - Ensure Ollama is running: `ollama serve`
-   - Download a model: `ollama pull llama2`
+   - Download a model: `ollama pull llama3`
    - Check installed models: `ollama list`
 
 2. **Slow Responses?**
