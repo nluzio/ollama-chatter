@@ -79,7 +79,7 @@ You can explore the full list of available models at [ollama.com/library](https:
 
 - **DeepSeek Models**: 
   - Excellent for reasoning tasks
-  - Available in various sizes (1.5B to 70B)
+  - Available in various sizes (1.5B to 671B)
   - Install with: `ollama pull deepseek-r1`
 
 - **Specialized Models**:
