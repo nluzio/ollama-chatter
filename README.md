@@ -9,7 +9,7 @@ A simple web interface to chat with AI models running on your own computer (no c
    git clone https://github.com/nluzio/ollama-chatter.git
    cd ollama-chatter
    pip install -r requirements.txt
-   ollama pull llama2
+   ollama pull deepseek-r1:1.5b
    ```
 3. Start the services:
    ```bash
