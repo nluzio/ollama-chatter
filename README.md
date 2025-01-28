@@ -28,7 +28,7 @@ A simple web interface to chat with AI models running on your own computer (no c
    ```
    ```bash
    # Terminal 2: Start Phoenix tracing UI
-   phoenix start
+   phoenix serve
    ```
    ```bash
    # Terminal 3: Start the chat app
