@@ -8,6 +8,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
 from openinference.semconv.trace import SpanAttributes, OpenInferenceSpanKindValues
+import uuid  
 
 @st.cache_resource
 def init_telemetry():
@@ -30,6 +31,7 @@ def init_telemetry():
 class OllamaClient:
     def __init__(self, base_url="http://localhost:11434/api"):
         self.base_url = base_url
+        self.tracer = init_telemetry()
     
     def get_available_models(self):
         """Get list of available models from Ollama"""
@@ -44,12 +46,13 @@ class OllamaClient:
             return []
     
     def chat(self, model, messages, system_prompt=None):
-        with tracer.start_as_current_span(
+        with self.tracer.start_as_current_span(
             "ollama.chat",
             attributes={
                 SpanAttributes.OPENINFERENCE_SPAN_KIND: OpenInferenceSpanKindValues.LLM.value,
                 SpanAttributes.LLM_MODEL_NAME: model,
                 SpanAttributes.LLM_PROVIDER: "ollama",
+                SpanAttributes.SESSION_ID: st.session_state.session_id,
                 SpanAttributes.LLM_INVOCATION_PARAMETERS: json.dumps({
                     "temperature": 0.7,
                     "top_p": 1.0,
@@ -62,7 +65,7 @@ class OllamaClient:
                 span.set_attribute(SpanAttributes.INPUT_VALUE, messages[-1]["content"])
                 
                 # Prepare messages and set input attributes
-                chat_messages = messages.copy()  # Create a copy to avoid modifying original
+                chat_messages = messages.copy()
                 if system_prompt:
                     chat_messages.insert(0, {"role": "system", "content": system_prompt})
 
@@ -81,15 +84,16 @@ class OllamaClient:
                     }
                 )
                 response.raise_for_status()
-                content = response.json()["message"]["content"]
+                response_data = response.json()
+                content = response_data["message"]["content"]
                 
                 # Set output value and message attributes
                 span.set_attribute(SpanAttributes.OUTPUT_VALUE, content)
                 span.set_attribute(f"{SpanAttributes.LLM_OUTPUT_MESSAGES}.0.message.role", "assistant")
                 span.set_attribute(f"{SpanAttributes.LLM_OUTPUT_MESSAGES}.0.message.content", content)
-                span.set_attribute(SpanAttributes.LLM_TOKEN_COUNT_COMPLETION, len(content.split()))
+                span.set_attribute(SpanAttributes.LLM_TOKEN_COUNT_PROMPT, response_data.get("prompt_eval_count", 0))
+                span.set_attribute(SpanAttributes.LLM_TOKEN_COUNT_COMPLETION, response_data.get("eval_count", 0))
                 
-                # Set success status
                 span.set_status(trace.Status(trace.StatusCode.OK))
                 
                 return content
@@ -144,6 +148,8 @@ def initialize_session_state():
         st.session_state.messages = []
     if "client" not in st.session_state:
         st.session_state.client = OllamaClient()
+    if "session_id" not in st.session_state:
+        st.session_state.session_id = str(uuid.uuid4())
 
 def main():
     st.title("Ollama Chat")
@@ -173,6 +179,7 @@ def main():
         # Clear chat button
         if st.button("Clear Chat"):
             st.session_state.messages = []
+            st.session_state.session_id = str(uuid.uuid4())  # Generate new session ID
             st.rerun()
 
     # Display chat messages
