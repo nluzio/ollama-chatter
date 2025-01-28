@@ -3,6 +3,16 @@
 A simple web interface to chat with AI models running on your own computer (no cloud needed!). Perfect for beginners exploring local AI.
 
 ## 🌟 Quick Start
+
+> **Note**
+> When running models locally with Ollama, your available RAM is key to performance! Before pulling a model, we recommend:
+> - Checking your available system memory (`top` on Mac/Linux, Task Manager on Windows)
+> - Comparing it with your chosen model's size (smaller models like deepseek-r1:1.5b need less RAM)
+> - Starting with smaller models like tinyllama or deepseek-r1:1.5b if you're unsure
+> 
+> This quick check helps ensure smooth operation! You can always upgrade to larger models as needed. 🚀
+
+
 1. Install Ollama from [ollama.com/download](https://ollama.com/download)
 2. Open a terminal and run:
    ```bash
