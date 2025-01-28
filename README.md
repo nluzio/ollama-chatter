@@ -74,7 +74,7 @@ This app includes OpenTelemetry tracing integration with [Arize Phoenix](https:/
    - Error states (if any)
 
 4. **Troubleshooting Traces**
-   - Ensure Phoenix is running (`phoenix start`)
+   - Ensure Phoenix is running (`phoenix serve`)
    - Check port 6006 is available
    - Verify traces appear in Phoenix UI after chat interactions
 
