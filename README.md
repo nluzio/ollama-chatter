@@ -51,9 +51,9 @@ A simple web interface to chat with AI models running on your own computer (no c
 - Clear conversations anytime
 - Monitor and analyze chat interactions with Phoenix tracing
 
-## 🔍 Tracing with Phoenix
+## 🔍 Tracing with [Phoenix](https://phoenix.arize.com/)
 
-This app includes OpenTelemetry tracing integration with Arize Phoenix, allowing you to:
+This app includes OpenTelemetry tracing integration with [Arize Phoenix](https://docs.arize.com/phoenix), allowing you to:
 
 1. **Monitor Chat Interactions**
    - View detailed traces of each conversation
