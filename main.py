@@ -2,6 +2,30 @@ import streamlit as st
 import requests
 import json
 import re
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.resources import Resource
+from openinference.semconv.trace import SpanAttributes, OpenInferenceSpanKindValues
+
+@st.cache_resource
+def init_telemetry():
+    # Initialize with proper resource attributes
+    resource = Resource.create({
+        "service.name": "ollama-chatter",
+        "service.version": "1.0.0",
+        "deployment.environment": "development"
+    })
+    
+    tracer_provider = TracerProvider(resource=resource)
+    # Configure OTLP exporter for Phoenix
+    otlp_exporter = OTLPSpanExporter(
+        endpoint="http://localhost:6006/v1/traces"
+    )
+    tracer_provider.add_span_processor(BatchSpanProcessor(otlp_exporter))
+    trace.set_tracer_provider(tracer_provider)
+    return trace.get_tracer(__name__)
 
 class OllamaClient:
     def __init__(self, base_url="http://localhost:11434/api"):
@@ -20,28 +44,61 @@ class OllamaClient:
             return []
     
     def chat(self, model, messages, system_prompt=None):
-        """Send a chat request to Ollama API"""
-        url = f"{self.base_url}/chat"
-        
-        if system_prompt:
-            messages.insert(0, {
-                "role": "system",
-                "content": system_prompt
-            })
-        
-        data = {
-            "model": model,
-            "messages": messages,
-            "stream": False
-        }
-        
-        try:
-            response = requests.post(url, json=data)
-            response.raise_for_status()
-            return response.json()["message"]["content"]
-        except Exception as e:
-            st.error(f"Error generating response: {e}")
-            return None
+        with tracer.start_as_current_span(
+            "ollama.chat",
+            attributes={
+                SpanAttributes.OPENINFERENCE_SPAN_KIND: OpenInferenceSpanKindValues.LLM.value,
+                SpanAttributes.LLM_MODEL_NAME: model,
+                SpanAttributes.LLM_PROVIDER: "ollama",
+                SpanAttributes.LLM_INVOCATION_PARAMETERS: json.dumps({
+                    "temperature": 0.7,
+                    "top_p": 1.0,
+                    "max_tokens": 2048
+                })
+            }
+        ) as span:
+            try:
+                # Set current input value (last message)
+                span.set_attribute(SpanAttributes.INPUT_VALUE, messages[-1]["content"])
+                
+                # Prepare messages and set input attributes
+                chat_messages = messages.copy()  # Create a copy to avoid modifying original
+                if system_prompt:
+                    chat_messages.insert(0, {"role": "system", "content": system_prompt})
+
+                # Set conversation history
+                for idx, msg in enumerate(chat_messages):
+                    span.set_attribute(f"{SpanAttributes.LLM_INPUT_MESSAGES}.{idx}.message.role", msg["role"])
+                    span.set_attribute(f"{SpanAttributes.LLM_INPUT_MESSAGES}.{idx}.message.content", msg["content"])
+                
+                # Make request
+                response = requests.post(
+                    f"{self.base_url}/chat",
+                    json={
+                        "model": model,
+                        "messages": chat_messages,
+                        "stream": False
+                    }
+                )
+                response.raise_for_status()
+                content = response.json()["message"]["content"]
+                
+                # Set output value and message attributes
+                span.set_attribute(SpanAttributes.OUTPUT_VALUE, content)
+                span.set_attribute(f"{SpanAttributes.LLM_OUTPUT_MESSAGES}.0.message.role", "assistant")
+                span.set_attribute(f"{SpanAttributes.LLM_OUTPUT_MESSAGES}.0.message.content", content)
+                span.set_attribute(SpanAttributes.LLM_TOKEN_COUNT_COMPLETION, len(content.split()))
+                
+                # Set success status
+                span.set_status(trace.Status(trace.StatusCode.OK))
+                
+                return content
+                
+            except Exception as e:
+                span.record_exception(e)
+                span.set_status(trace.Status(trace.StatusCode.ERROR, str(e)))
+                st.error(f"Error generating response: {e}")
+                return None
 
 def parse_thinking(text):
     """Parse text to separate thinking process from regular response"""
@@ -100,7 +157,7 @@ def main():
         # Model selection
         available_models = st.session_state.client.get_available_models()
         if not available_models:
-            available_models = ["llama2"]
+            available_models = ["run ollama pull <model_name>"]
         
         selected_model = st.selectbox(
             "Select Model",
@@ -139,4 +196,5 @@ def main():
             st.session_state.messages.append({"role": "assistant", "content": response})
 
 if __name__ == "__main__":
+    tracer = init_telemetry()
     main()
