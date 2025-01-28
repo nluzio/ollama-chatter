@@ -104,10 +104,10 @@ Start with these beginner-friendly models:
 
 | Model     | Best For                    | Size    | Command               |
 |-----------|----------------------------|---------|----------------------|
-| llama3    | General chat & assistance  | large  | `ollama pull llama3` |
+| llama3    | General chat & assistance  | Large  | `ollama pull llama3` |
 | mistral   | Clear, helpful responses   | Medium  | `ollama pull mistral`|
-| tinyllama | Faster, lighter responses  | Small   | `ollama pull tinyllama` |
-| deepseek-r1 | Advanced reasoning tasks | Very Large   | `ollama pull deepseek-r1` |
+| deepseek-r1:1.5b | Small Version of Advanced Reasoning Model | Small   | `ollama pull deepseek-r1:1.5b` |
+| tinyllama | Faster, lighter responses  | Tiny   | `ollama pull tinyllama` |
 
 ### 📚 Finding More Models
 
