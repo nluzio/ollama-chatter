@@ -81,6 +81,7 @@ This app includes OpenTelemetry tracing integration with Arize Phoenix, allowing
 
 1. **Choose a Model**
    - Select a model from the sidebar dropdown
+
    - If no models appear, run: `ollama pull deepseek-r1:1.5b`
 
 2. **Start Chatting**
@@ -102,7 +103,7 @@ Start with these beginner-friendly models:
 
 | Model     | Best For                    | Size    | Command               |
 |-----------|----------------------------|---------|----------------------|
-| llama2    | General chat & assistance  | Medium  | `ollama pull llama2` |
+| llama3    | General chat & assistance  | large  | `ollama pull llama3` |
 | mistral   | Clear, helpful responses   | Medium  | `ollama pull mistral`|
 | tinyllama | Faster, lighter responses  | Small   | `ollama pull tinyllama` |
 | deepseek-r1 | Advanced reasoning tasks | Very Large   | `ollama pull deepseek-r1` |
@@ -113,7 +114,7 @@ You can explore the full list of available models at [ollama.com/library](https:
 
 - **DeepSeek Models**: 
   - Excellent for reasoning tasks
-  - Available in various sizes (1.5B to 70B)
+  - Available in various sizes (1.5B to 671B)
   - Install with: `ollama pull deepseek-r1`
 
 - **Specialized Models**:
@@ -137,7 +138,7 @@ ollama pull model-name
 
 1. **No Models Available?**
    - Ensure Ollama is running: `ollama serve`
-   - Download a model: `ollama pull llama2`
+   - Download a model: `ollama pull llama3`
    - Check installed models: `ollama list`
 
 2. **Slow Responses?**
