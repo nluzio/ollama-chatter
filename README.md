@@ -9,17 +9,24 @@ A simple web interface to chat with AI models running on your own computer (no c
    git clone https://github.com/nluzio/ollama-chatter.git
    cd ollama-chatter
    pip install -r requirements.txt
-   ollama pull llama2
+   ollama pull deepseek-r1:1.5b
    ```
-3. Start the services:
+3. Start the services (in separate terminal windows):
    ```bash
-   ollama serve  # Keep this terminal window open
+   # Terminal 1: Start Ollama
+   ollama serve
    ```
    ```bash
-   # Open a new terminal window and run:
+   # Terminal 2: Start Phoenix tracing UI
+   phoenix start
+   ```
+   ```bash
+   # Terminal 3: Start the chat app
    streamlit run main.py
    ```
-4. Open your browser to `http://localhost:8501` and start chatting!
+4. Open your browser to:
+   - Chat UI: `http://localhost:8501`
+   - Tracing UI: `http://localhost:6006`
 
 ## 🧰 Prerequisites
 
@@ -42,12 +49,39 @@ A simple web interface to chat with AI models running on your own computer (no c
 - View the AI's thinking process
 - Save chat history
 - Clear conversations anytime
+- Monitor and analyze chat interactions with Phoenix tracing
+
+## 🔍 Tracing with Phoenix
+
+This app includes OpenTelemetry tracing integration with Arize Phoenix, allowing you to:
+
+1. **Monitor Chat Interactions**
+   - View detailed traces of each conversation
+   - Track model performance and response times
+   - Analyze input/output patterns
+
+2. **Access the Tracing UI**
+   - Open `http://localhost:6006` in your browser
+   - View traces under the "Traces" tab
+   - Filter and search through chat history
+
+3. **What's Being Traced**
+   - Model information (name, provider)
+   - Input messages and system prompts
+   - Output responses
+   - Token counts
+   - Error states (if any)
+
+4. **Troubleshooting Traces**
+   - Ensure Phoenix is running (`phoenix start`)
+   - Check port 6006 is available
+   - Verify traces appear in Phoenix UI after chat interactions
 
 ## 💭 Using the App
 
 1. **Choose a Model**
    - Select a model from the sidebar dropdown
-   - If no models appear, run: `ollama pull llama2`
+   - If no models appear, run: `ollama pull deepseek-r1:1.5b`
 
 2. **Start Chatting**
    - Type messages in the bottom text box
