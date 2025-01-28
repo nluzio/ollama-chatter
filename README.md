@@ -19,11 +19,11 @@ A simple web interface to chat with AI models running on your own computer (no c
    git clone https://github.com/nluzio/ollama-chatter.git
    cd ollama-chatter
    pip install -r requirements.txt
-   ollama pull deepseek-r1:1.5b
    ```
 3. Start the services (in separate terminal windows):
    ```bash
-   # Terminal 1: Start Ollama
+   # Terminal 1: Pull a model & Start Ollama
+   ollama pull deepseek-r1:1.5b
    ollama serve
    ```
    ```bash
@@ -36,7 +36,7 @@ A simple web interface to chat with AI models running on your own computer (no c
    ```
 4. Open your browser to:
    - Chat UI: `http://localhost:8501`
-   - Tracing UI: `http://localhost:6006`
+   - Phoenix UI: `http://localhost:6006`
 
 ## 🧰 Prerequisites
 
@@ -67,7 +67,7 @@ A simple web interface to chat with AI models running on your own computer (no c
 This app includes OpenTelemetry tracing integration with [Arize Phoenix](https://docs.arize.com/phoenix), allowing you to:
 
 1. **Monitor Chat Interactions**
-   - View detailed traces of each conversation
+   - View detailed traces of each LLM Interaction
    - Track model performance and response times
    - Analyze input/output patterns
 
@@ -75,6 +75,7 @@ This app includes OpenTelemetry tracing integration with [Arize Phoenix](https:/
    - Open `http://localhost:6006` in your browser
    - View traces under the "Traces" tab
    - Filter and search through chat history
+   - - Analyze full conversations with "Sessions" tab
 
 3. **What's Being Traced**
    - Model information (name, provider)
